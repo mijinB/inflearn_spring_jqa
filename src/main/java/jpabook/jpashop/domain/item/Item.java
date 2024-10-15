@@ -24,4 +24,10 @@ public abstract class Item {
 
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<>();
+
+    // 비즈니스 로직
+    // data(stockQuantity(재고 수량))를 가지고 있는 곳에서 비즈니스 로직이 나가는게 좋다.
+    public void addStock(int quantity) {
+        this.stockQuantity += quantity;
+    }
 }
