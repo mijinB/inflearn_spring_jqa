@@ -1,18 +1,20 @@
 package jpabook.jpashop.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jpabook.jpashop.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor        // @PersistenceContext 대신 [생성자 주입]을 사용할 수 있고, 이 또한 @RequiredArgsConstructor 를 사용하면 자동으로 만들어주기 때문에 간략하고 일관성 있다. (+ em에 final 추가)  / 현재는 스프링 데이터 JPA 가 없으면 생성자 주입으로 대신할 수 없지만, 향후에는 스프링 자체에서도 가능하도록 해줄 가능성이 있다.
 public class MemberRepository {
 
-    // JPA 에서 제공하는 PersistenceContext 를 사용하면 스프링이 엔티티 매니저를 만들어서 em 이라는 변수에 주입해주게 된다.
-    @PersistenceContext
-    private EntityManager em;
+    /* [생성자 주입] 사용으로 변경
+    JPA 에서 제공하는 PersistenceContext 를 사용하면 스프링이 엔티티 매니저를 만들어서 em 이라는 변수에 주입해주게 된다.
+    @PersistenceContext */
+    private final EntityManager em;
 
     // JPA 가 저장하는 로직 (DB 에 insert 쿼리가 날라가는 것)
     public void save(Member member) {
