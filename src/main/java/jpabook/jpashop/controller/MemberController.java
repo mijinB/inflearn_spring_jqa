@@ -11,6 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
@@ -38,5 +40,12 @@ public class MemberController {
 
         memberService.join(member);
         return "redirect:/";
+    }
+
+    @GetMapping("/members")
+    public String list(Model model) {
+        List<Member> members = memberService.findMembers();     // 지금은 서버사이드라서 Entity 를 화면으로 보내주고 화면에서 필요한 Entity 필드들을 꺼내서 노출시켜주지만, API 를 사용하게 될 경우에는 절대로!! Entity 를 넘겨줘서는 안된다. ⇒ Form 객체나 DTO(Data Transfer Object)를 사용하고 Entity 는 최대한 순수하게 유지를 해야한다. / DTO(Data Transfer Object) : 계층 간 데이터 교환을 위해 사용되는 객체, 로직을 가지지 않는 데이터 객체, getter, setter 메소드만 가진 클래스를 의미한다.
+        model.addAttribute("members", members);
+        return "members/memberList";
     }
 }
