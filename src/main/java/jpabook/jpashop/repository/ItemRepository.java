@@ -18,7 +18,9 @@ public class ItemRepository {
         if (item.getId() == null) {
             em.persist(item);
         } else {
-            em.merge(item);
+            // ⭐변경 감지와 병합(merge) 의 차이를 완벽하게 이해해야 한다. / service > ItemService.java (변경 감지 기능 사용 예시) / !!주의 : 변경 감지 기능을 사용하면 원하는 속성만 선택해서 변경할 수 있지만, 병합을 사용하면 모든 속성이 변경된다. ⇒ null 로 업데이트 할 위험이 있다.
+            // 💡엔티티를 변경할 때는 항상 변경 감지를 사용해라.
+            em.merge(item);     // 병합(merge) 사용도 변경 감지 기능과 동일한 역할을 한다. ⇒ 파라미터로 넘어온 준영속 Entity 의 식별자(id)로 찾아서 모든 걸 "바꿔치기" 하는 것. (=변경 감지 기능 사용처럼 한땀한땀 작성하는 코드를 JPA 가 한 줄의 코드로 해주는 것이다.)
         }
     }
 
