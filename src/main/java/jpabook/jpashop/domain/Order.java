@@ -41,7 +41,7 @@ public class Order {
     // 연관관계 편의 메서드 ⇒ 양방향 관계일 때 양쪽 세팅을 한 코드로 해결하는 것.
     public void setMember(Member member) {
         this.member = member;
-        member.getOrders().add(this);
+//        member.getOrders().add(this);
     }
 
     public void addOrderItem(OrderItem orderItem) {
