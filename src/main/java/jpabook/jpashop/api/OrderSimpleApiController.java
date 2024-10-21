@@ -5,6 +5,8 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     // 무한루프에 빠진다. 해결하려면 Order 와 양방향이 걸려있는 곳에 전부 @JsonIgnore 을 추가해줘야 한다. 둘 중에 하나는 끊어줘야하기 때문.
     // 위 문제를 해결해도 지연로딩때문에 또 다른 문제가 생기는데, Hibernate5Module 라이브러리를 설치해서 지연로딩일 경우에는 JSON 라이브러리에게 아무것도 뿌리지 말라고 해서 해결해야 한다.
@@ -59,6 +62,13 @@ public class OrderSimpleApiController {
                 .collect(Collectors.toList());
 
         return result;
+    }
+
+    // select 절이 간략해졌지만 V3의 패치 조인이 더 좋다. ⇒ 성능을 좌우하는 것은 select 절이 아니다. select 절은 차이가 미비하다.
+    // 우선 패치 조인으로 성능을 최적화 하고, 그래도 안되면 V4와 같이 JPA 에서 DTO 로 직접 조회하는 방법을 사용한다.
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderSimpleQueryRepository.findOrderDtos();
     }
 
     @Data
