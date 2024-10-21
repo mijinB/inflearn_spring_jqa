@@ -113,12 +113,23 @@ public class OrderRepository {
         ).getResultList();
     }
 
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
     // 컬렉션 패치 조인 = 1:N 패치 조인
     // ⭐컬렉션 패치 조인은 1개만 사용할 수 있다. 둘 이상을 사용하면 N:M 이 돼서 엄청나게 많이 뻥튀기가 된다.
     public List<Order> findAllWithItem() {
         /* distinct : 중복 제거  ⇒  DB 에선 결과가 똑같다. DB distinct 는 줄의 모든 값이 동일해야 하는데, join 한 결과로는 orderItem 부분이 동일하지 않다.
             JPA 에서의 distinct 는 SQL 에 distinct 를 추가해서 중복을 걸러준다.
-             ⇒ 단점은 페이징이 불가능하다는 것이다. */
+             ⇒ 단점은 페이징이 불가능하다는 것이다.
+               (↑ findAllWithMemberDelivery 페이징처리 참고. 이 메서드는 ToOne 이기 때문에 패치 조인이 얼마든지 가능한 것이다.) */
         return em.createQuery(
                 "select distinct o from Order o" +
                         " join fetch o.member m" +

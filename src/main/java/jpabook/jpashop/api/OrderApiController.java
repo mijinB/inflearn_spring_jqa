@@ -9,6 +9,7 @@ import jpabook.jpashop.repository.OrderSearch;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -53,6 +54,28 @@ public class OrderApiController {
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithItem();
+
+        List<OrderDto> result = orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    /* ⭐
+    * ToOne(OneToOne, ManyToOne) 관계를 모두 페치조인 한다. ⇒ ToOne 관계는 row 수를 증가시키지 않으므로 페이징 쿼리에 영향을 주지 않는다.
+    * 컬렉션은 지연 로딩으로 조회한다.
+    * 💡application.yml 파일에 default_batch_fetch_size: 100(size 만큼 IN 쿼리로 조회) 를 추가함으로써 orderItem 을 2개씩 총 4번(order 2개) 쿼리를 실행하던게 한번의 쿼리로 된다. ⇒ 100개를 한번에 조회. 엄청 빠르기때문에 성능 최적화 도움을 준다.
+    *   (100이기 때문에 쿼리가 1000개이면 10번 돌겠지만 또 size 를 1000으로 수정한다면 1:1이 되는 것이다.) + 100~1000 사이를 선택하는 것을 권장.애매하면 100~500.
+    *  ⇒ v3에서는 쿼리 1개로 됐지만, 페이징처리 불가능! & 정규화되기 전의 결과. 중복o / v3.1은 쿼리는 3번이지만, 페이징처리가 가능! & 정규화 후의 결과. 중복x(쿼리 호출 수가 약간 증가하지만, DB 데이터 전송량이 감소한다.)
+    * 결론 : ToOne 관계는 페치 조인해도 페이징에 영향을 주지 않는다. 따라서 ToOne 관계는 페치조인으로 쿼리 수를 줄이고 해결하고, 나머지(컬렉션)는 hibernate.default_batch_fetch_size(+@BatchSize) 로 최적화 하자. */
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "100") int limit
+            ) {
+
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
 
         List<OrderDto> result = orders.stream()
                 .map(o -> new OrderDto(o))
