@@ -48,6 +48,18 @@ public class OrderApiController {
 
         return result;
     }
+
+    // 패치 조인으로 SQL 이 한번만 실행된다.
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        List<OrderDto> result = orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
+
+        return result;
+    }
     
     @Getter
     static class OrderDto {
