@@ -92,8 +92,13 @@ public class OrderApiController {
     *     ToMany 관계는 조인하면 row 수가 증가하기 때문이다. */
     @GetMapping("/api/v4/orders")
     public List<OrderQueryDto> ordersV4() {
-
         return orderQueryRepository.findOrderQueryDtos();
+    }
+
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> ordersV5() {
+        // 실제 변수명을 이렇게 짓진 않는다.
+        return orderQueryRepository.findAllByDto_optimization();
     }
     
     @Getter
