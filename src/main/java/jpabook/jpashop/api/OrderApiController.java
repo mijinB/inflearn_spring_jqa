@@ -6,6 +6,8 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
@@ -82,6 +85,15 @@ public class OrderApiController {
                 .collect(Collectors.toList());
 
         return result;
+    }
+
+    /* ToOne 관계들을 먼저 조회하고, ToMany(1:N) 관계는 각각 별도로 처리한다.
+    *   ⇒ ToOne 관계는 조인해도 데이터 row 수가 증가하지 않지만,
+    *     ToMany 관계는 조인하면 row 수가 증가하기 때문이다. */
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> ordersV4() {
+
+        return orderQueryRepository.findOrderQueryDtos();
     }
     
     @Getter
